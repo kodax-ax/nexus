@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Package, Truck, LayoutDashboard, Globe, Mail, Search, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Package, Truck, LayoutDashboard, Globe, Mail, Search, ChevronDown, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import LocationStatus from './LocationStatus';
 import FloatingNavbar from './FloatingNavbar';
@@ -18,14 +18,44 @@ const LANGUAGES = [
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const [lang, setLang] = useState(LANGUAGES[0]);
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    // Mock Session check
+    const checkSession = () => {
+      const mockUser = localStorage.getItem('mock_user');
+      setSession(mockUser ? JSON.parse(mockUser) : null);
+    };
+
+    checkSession();
+    
+    // Listen for storage changes (for tab synchronization if needed)
+    window.addEventListener('storage', checkSession);
+    
+    // In a real SPA, you'd use a context or a custom event to detect login/logout
+    // For this simple mock, we'll just check every second if the session changed
+    const interval = setInterval(checkSession, 1000);
+
+    return () => {
+      window.removeEventListener('storage', checkSession);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('mock_user');
+    setSession(null);
+    navigate('/');
+  };
 
   const navItems = [
     { name: 'Home', path: '/', icon: Globe },
     { name: 'Tracking', path: '/tracking', icon: Search },
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    ...(session ? [{ name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard }] : []),
     { name: 'Services', path: '/services', icon: Truck },
     { name: 'Contact', path: '/contact', icon: Mail },
   ];
@@ -113,16 +143,29 @@ export default function Layout({ children }: LayoutProps) {
                 OPERATIONAL 99.9%
               </div>
             </div>
-            <Link
-              to="/auth"
-              className={`px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors border ${
-                theme === 'light' 
-                  ? 'bg-black text-white hover:bg-blue-600' 
-                  : 'bg-white text-black hover:bg-blue-600 hover:text-white'
-              }`}
-            >
-              Sign In
-            </Link>
+            {session ? (
+              <button
+                onClick={handleLogout}
+                className={`px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors border flex items-center gap-2 ${
+                  theme === 'light' 
+                    ? 'bg-red-600 text-white hover:bg-black' 
+                    : 'bg-red-600 text-white hover:bg-white hover:text-black'
+                }`}
+              >
+                <LogOut size={12} /> Sign Out
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className={`px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-colors border ${
+                  theme === 'light' 
+                    ? 'bg-black text-white hover:bg-blue-600' 
+                    : 'bg-white text-black hover:bg-blue-600 hover:text-white'
+                }`}
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -174,9 +217,9 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <span className={`text-[10px] uppercase tracking-widest font-mono opacity-50 ${theme === 'light' ? 'text-black' : 'text-zinc-600'}`}>DB: SUPABASE CLOUD (REGION: EU-WEST-2)</span>
+          <span className={`text-[10px] uppercase tracking-widest font-mono opacity-50 ${theme === 'light' ? 'text-black' : 'text-zinc-600'}`}>ENGINE: LOCAL VOLATILE STORAGE (REGION: BROWSER-CACHE)</span>
           <div className={`flex gap-8 text-[10px] uppercase tracking-widest italic font-serif opacity-30 ${theme === 'light' ? 'text-black' : 'text-zinc-600'}`}>
-            Nexus Terminal v.4.4.1 © 2026 Supply Architecture Inc.
+            Nexus Terminal v.5.0.0-mock © 2026 Local Architecture Unit
           </div>
         </div>
       </footer>
