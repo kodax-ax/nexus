@@ -1,0 +1,75 @@
+{
+  "entities": {
+    "shipment": {
+      "title": "Shipment",
+      "description": "A core shipment entity containing logistics and tracking data.",
+      "type": "object",
+      "properties": {
+        "tracking_id": { "type": "string", "description": "Unique tracking identifier (e.g., NEX-12345)" },
+        "sender": { "$ref": "address", "description": "JSON object of sender details" },
+        "receiver": { "$ref": "address", "description": "JSON object of receiver details" },
+        "current_status": { "type": "string", "enum": ["PICKUP_PENDING", "IN_TRANSIT", "OUT_FOR_DELIVERY", "DELIVERED", "EXCEPTION"] },
+        "estimated_delivery": { "type": "string", "format": "date-time" },
+        "location_history": {
+          "type": "array",
+          "items": { "type": "object" },
+          "description": "List of timestamped location updates"
+        },
+        "ai_intelligence": {
+          "type": "object",
+          "properties": {
+            "predictive_eta": { "type": "string", "format": "date-time", "description": "AI-calculated ETA based on historical port congestion" },
+            "carbon_offset_kg": { "type": "number", "description": "Carbon footprint for green routing" },
+            "risk_score": { "type": "number", "description": "Predicted delivery risk (0-1)" }
+          }
+        },
+        "weight": { "type": "number" },
+        "dimensions": {
+          "type": "object",
+          "properties": {
+             "l": { "type": "number" },
+             "w": { "type": "number" },
+             "h": { "type": "number" }
+          }
+        }
+      },
+      "required": ["tracking_id", "sender", "receiver", "current_status"]
+    },
+    "address": {
+      "title": "Address",
+      "description": "Standard address structure",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "street": { "type": "string" },
+        "city": { "type": "string" },
+        "country": { "type": "string" },
+        "zip": { "type": "string" }
+      }
+    },
+    "quote": {
+      "title": "Quote Request",
+      "description": "Captured lead from landing page rate calculator",
+      "type": "object",
+      "properties": {
+        "client_name": { "type": "string" },
+        "email": { "type": "string" },
+        "origin": { "type": "string" },
+        "destination": { "type": "string" },
+        "weight": { "type": "number" },
+        "estimated_cost": { "type": "number" },
+        "ai_green_alternative": { "type": "boolean", "description": "Customer requested eco-friendly routing" }
+      }
+    }
+  },
+  "firestore": {
+    "/shipments/{shipmentId}": {
+      "schema": "shipment",
+      "description": "Global shipment repository"
+    },
+    "/quotes/{quoteId}": {
+      "schema": "quote",
+      "description": "Inbound quote lead capture"
+    }
+  }
+}

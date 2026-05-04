@@ -1,0 +1,33 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import TrackingPortal from './pages/TrackingPortal';
+import ClientDashboard from './pages/ClientDashboard';
+import Services from './pages/Services';
+import Contact from './pages/Contact';
+import Auth from './pages/Auth';
+import { ThemeProvider } from './contexts/ThemeContext';
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/tracking" element={<TrackingPortal />} />
+            <Route path="/dashboard" element={<ClientDashboard />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/auth" element={<Auth />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </ThemeProvider>
+  );
+}

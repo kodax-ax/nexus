@@ -1,0 +1,13 @@
+{
+  "name": "Nexus Global Logistics",
+  "description": "High-end logistics solution for high-volume shipping, B2B warehousing, and real-time management.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "Real-time Tracking",
+    "AI-Powered Logistics",
+    "Client Dashboard",
+    "Rate Calculator"
+  ]
+}
